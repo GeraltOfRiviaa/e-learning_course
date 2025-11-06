@@ -243,7 +243,7 @@ All foreign key columns are indexed to optimize JOIN operations and maintain dat
 
 ## 🧭 ER Diagram
 
-You can visualize this schema using [dbdiagram.io](https://dbdiagram.io) by importing the `.dbml` source file from this repository.
+You can visualize this schema using [dbdiagram.io](https://dbdiagram.io) by importing the `.txt` source file from this repository.
 
 ---
 
