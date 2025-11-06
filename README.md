@@ -254,6 +254,6 @@ You may adapt or extend the model for learning management systems, academic proj
 
 ---
 
-**Author:** [Your Name]  
+**Author:** Samuel Svoboda  
 **Date:** 2025  
 **Version:** 1.0  
