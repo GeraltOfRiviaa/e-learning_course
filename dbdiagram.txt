@@ -1,0 +1,179 @@
+Table Teacher {
+  teacher_id int [pk, increment]
+  first_name varchar(30) [not null]
+  last_name varchar(30) [not null]
+  nickname varchar(30) [unique, not null]
+  email varchar(100) [unique, not null]
+  password varchar(50) [not null]
+  bio text(1000) [null]
+  education int [ref: < Education.id_education, null]
+  profile_photo blob [null]
+  registration_date date [not null]
+
+  indexes {
+    (email) [unique, name: "idx_teacher_email"]
+    (nickname) [unique, name: "idx_teacher_nickname"]
+    (education) [name: "idx_teacher_education"]
+    (nickname) [name: "idx_nicname"]
+    (registration_date) [name: "idx_registration_date"]
+  }
+}
+
+Table Student {
+  student_id int [pk, increment]
+  first_name varchar(30) [not null]
+  last_name varchar(30) [not null]
+  nickname varchar(30) [not null]
+  email varchar(100) [unique, not null]
+  password varchar(50) [not null]
+  bio text(1000) [null]
+  education int [ref: < Education.id_education, null]
+  profile_photo blob [null]
+  registration_date date [not null]
+
+  indexes {
+    (email) [unique, name: "idx_student_email"]
+    (education) [name: "idx_student_education"]
+    (nickname) [name: "idx_nicname"]
+  }
+}
+
+Table Education {
+  id_education int [pk, increment]
+  name char(100) [not null]
+}
+
+Table Course {
+  course_id int [pk, increment]
+  title varchar(200) [not null]
+  description text(2000) [not null]
+  difficulty enum('beginner', 'intermediate', 'advanced') [not null]
+  category int [ref: < Category.category_id]
+  creation_date date [not null]
+  is_active boolean [not null]
+  teacher_id int [ref: > Teacher.teacher_id, not null]
+
+  indexes {
+    (teacher_id) [name: "idx_course_teacher"]
+    (category) [name: "idx_course_category"]
+    (title) [name: "idx_course_title"]
+  }
+}
+
+Table Lesson {
+  lesson_id int [pk, increment]
+  course_id int [ref: > Course.course_id]
+  title varchar(50) [not null]
+  description text(1000) [null] 
+  requirements text(200) [null]
+
+  indexes {
+    (course_id) [name: "idx_lesson_course"]
+    (title) [name: "idx_lesson_title"]
+  }
+}
+
+Table Module {
+  id_module int [pk, increment]
+  id_lesson int [ref: > Lesson.lesson_id]
+  id_course int [ref: > Course.course_id]
+  study_text text
+
+  indexes {
+    (id_course) [name: "idx_module_course"]
+    (id_lesson) [name: "idx_module_lesson"]
+  }
+}
+
+Table Attachment {
+  attachment_id int [pk, increment] 
+  module_id int [ref: > Module.id_module]
+  file blob [not null]
+  file_name varchar(255) [not null]
+  file_size int [not null]
+  upload_date datetime [not null]
+
+  indexes {
+    (module_id) [name: "idx_attachment_module"]
+  }
+}
+
+Table Calendar {
+  calendar_id int [pk, increment]
+  id_teacher int [ref: > Teacher.teacher_id, null]
+  id_student int [ref: > Student.student_id, null]
+
+  indexes {
+    (id_teacher) [name: "idx_calendar_teacher"]
+    (id_student) [name: "idx_calendar_student"]
+  }
+}
+
+Table Message {
+  message_id int [pk, increment]
+  sender_student int [ref: > Student.student_id, null]
+  sender_teacher int [ref: > Teacher.teacher_id, null]
+  receiver_student int [ref: > Student.student_id, null]
+  receiver_teacher int [ref: > Teacher.teacher_id, null]
+  content text [not null]
+  sent_at datetime [ not null]
+
+  indexes {
+    (content) [name: "idx_message"]
+    (sent_at) [name: "idx_message_sent_at"]
+  }
+}
+
+Table Certificates {
+  certificate_id int [pk, increment]
+  course_id int [ref: > Course.course_id]
+  certificate_name varchar(255) [not null]
+
+  indexes {
+    (course_id) [name: "idx_certificates_course"]
+  }
+}
+
+
+Table Certificate {
+  id_certificate int [ref: > Certificates.certificate_id]
+  id_student int [ref: > Student.student_id]
+  issue_date date [not null]
+
+  indexes {
+    (id_student) [name: "idx_certificate_student"]
+    (id_certificate) [name: "idx_certificate_certificate"]
+  }
+}
+
+Table Category {
+  category_id int [pk, increment]
+  course_id int [ref: > Course.course_id]
+  category_name varchar(100) [unique]
+  is_superior bool [not null]
+
+  indexes {
+    (category_name) [unique, name: "uq_category_name"]
+    (category_id) [unique, name: "idx_category"]
+  }
+}
+
+Table Event {
+  id_event int [pk, increment]
+  id_calendar int [ref: > Calendar.calendar_id]
+  course_id int [ref: > Course.course_id]
+  lesson_id int [ref: > Lesson.lesson_id, null]
+  is_global bool [not null]
+  title varchar(200) [not null]
+  video_call_link text(500) [null]
+  description text(1000) [null]
+  event_date date [not null]
+  event_time time [not null]
+
+  indexes {
+    (course_id) [name: "idx_event_course"]
+    (lesson_id) [name: "idx_event_lesson"]
+    (event_date, event_time) [name: "idx_event_datetime"]
+  }
+}
+
