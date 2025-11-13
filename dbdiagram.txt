@@ -1,46 +1,38 @@
-Table Teacher {
-  teacher_id int [pk, increment]
+Table User {
+  user_id int [pk, increment]
   first_name varchar(30) [not null]
   last_name varchar(30) [not null]
   nickname varchar(30) [unique, not null]
   email varchar(100) [unique, not null]
   password varchar(50) [not null]
-  bio text(1000) [null]
-  education int [ref: < Education.id_education, null]
+  bio text [null]
+  education_id int [ref: > Education.id_education, null]
   profile_photo blob [null]
-  registration_date date [not null]
-
-  indexes {
-    (email) [unique, name: "idx_teacher_email"]
-    (nickname) [unique, name: "idx_teacher_nickname"]
-    (education) [name: "idx_teacher_education"]
-    (nickname) [name: "idx_nicname"]
-    (registration_date) [name: "idx_registration_date"]
-  }
-}
-
-Table Student {
-  student_id int [pk, increment]
-  first_name varchar(30) [not null]
-  last_name varchar(30) [not null]
-  nickname varchar(30) [not null]
-  email varchar(100) [unique, not null]
-  password varchar(50) [not null]
-  bio text(1000) [null]
-  education int [ref: < Education.id_education, null]
-  profile_photo blob [null]
+  role enum('teacher', 'student') [not null]
   registration_date date [not null]
 
   indexes {
     (email) [unique, name: "idx_student_email"]
-    (education) [name: "idx_student_education"]
-    (nickname) [name: "idx_nicname"]
+    (education_id) [name: "idx_student_education"]
+    (nickname) [name: "idx_nickname"]
   }
 }
 
 Table Education {
   id_education int [pk, increment]
   name char(100) [not null]
+}
+
+Table Category {
+  category_id int [pk, increment]
+  category_name varchar(100) [unique, not null]
+  parent_category_id int [ref: > Category.category_id, null]
+  is_superior bool [not null]
+
+  indexes {
+    (category_name) [unique, name: "uq_category_name"]
+    (category_id) [unique, name: "idx_category"]
+  }
 }
 
 Table Course {
@@ -51,12 +43,13 @@ Table Course {
   category int [ref: < Category.category_id]
   creation_date date [not null]
   is_active boolean [not null]
-  teacher_id int [ref: > Teacher.teacher_id, not null]
+  users_teacher_id int [ref: > User.user_id, not null]
 
   indexes {
-    (teacher_id) [name: "idx_course_teacher"]
+    (users_teacher_id) [name: "idx_course_user"]
     (category) [name: "idx_course_category"]
     (title) [name: "idx_course_title"]
+    (users_teacher_id, course_id) [pk, name: "pk_teacher_in_course"]
   }
 }
 
@@ -88,9 +81,10 @@ Table Module {
 Table Attachment {
   attachment_id int [pk, increment] 
   module_id int [ref: > Module.id_module]
-  file blob [not null]
+  file longblob [not null]
   file_name varchar(255) [not null]
   file_size int [not null]
+  file_type varchar(20) [not null]
   upload_date datetime [not null]
 
   indexes {
@@ -98,70 +92,26 @@ Table Attachment {
   }
 }
 
+Table UsersInCourse {
+  user_id int [ref: > User.user_id]
+  course_id int [ref: > Course.course_id]
+  role enum('teacher', 'student') [not null]
+
+  indexes {
+    (user_id, course_id) [pk, name: "pk_users_in_course"]
+    (role) [name: "idx_users_in_course_role"]
+  }
+}
+
 Table Calendar {
   calendar_id int [pk, increment]
-  id_teacher int [ref: > Teacher.teacher_id, null]
-  id_student int [ref: > Student.student_id, null]
-
-  indexes {
-    (id_teacher) [name: "idx_calendar_teacher"]
-    (id_student) [name: "idx_calendar_student"]
-  }
-}
-
-Table Message {
-  message_id int [pk, increment]
-  sender_student int [ref: > Student.student_id, null]
-  sender_teacher int [ref: > Teacher.teacher_id, null]
-  receiver_student int [ref: > Student.student_id, null]
-  receiver_teacher int [ref: > Teacher.teacher_id, null]
-  content text [not null]
-  sent_at datetime [ not null]
-
-  indexes {
-    (content) [name: "idx_message"]
-    (sent_at) [name: "idx_message_sent_at"]
-  }
-}
-
-Table Certificates {
-  certificate_id int [pk, increment]
-  course_id int [ref: > Course.course_id]
-  certificate_name varchar(255) [not null]
-
-  indexes {
-    (course_id) [name: "idx_certificates_course"]
-  }
-}
-
-
-Table Certificate {
-  id_certificate int [ref: > Certificates.certificate_id]
-  id_student int [ref: > Student.student_id]
-  issue_date date [not null]
-
-  indexes {
-    (id_student) [name: "idx_certificate_student"]
-    (id_certificate) [name: "idx_certificate_certificate"]
-  }
-}
-
-Table Category {
-  category_id int [pk, increment]
-  course_id int [ref: > Course.course_id]
-  category_name varchar(100) [unique]
-  is_superior bool [not null]
-
-  indexes {
-    (category_name) [unique, name: "uq_category_name"]
-    (category_id) [unique, name: "idx_category"]
-  }
+  user_id int [ref: > User.user_id]
 }
 
 Table Event {
   id_event int [pk, increment]
   id_calendar int [ref: > Calendar.calendar_id]
-  course_id int [ref: > Course.course_id]
+  course_id int [ref: > Course.course_id, null]
   lesson_id int [ref: > Lesson.lesson_id, null]
   is_global bool [not null]
   title varchar(200) [not null]
@@ -177,3 +127,29 @@ Table Event {
   }
 }
 
+Table Message {
+  message_id int [pk, increment]
+  sender_id int [ref: > User.user_id, not null]
+  receiver_id int [ref: > User.user_id, not null]
+  content text [not null]
+  sent_at datetime [not null]
+
+  indexes {
+    (sent_at) [name: "idx_message_sent_at"]
+  }
+}
+
+Table CertificateType {
+  certificate_id int [pk, increment]
+  name varchar(255) [not null]
+  description text [not null]               
+  badge blob [not null]
+  course_id int [ref: - Course.course_id, not null]
+}
+
+Table UserCertificate {
+  user_certificate_id int [pk, increment]
+  user_id int [ref: > User.user_id]
+  certificate_type_id int [ref: > CertificateType.certificate_id]
+  issue_date date [not null]
+}
