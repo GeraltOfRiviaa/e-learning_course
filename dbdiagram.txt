@@ -4,52 +4,54 @@ Table User {
   last_name varchar(30) [not null]
   nickname varchar(30) [unique, not null]
   email varchar(100) [unique, not null]
-  password varchar(50) [not null]
+  password varchar(255) [not null]
   bio text [null]
-  education_id int [ref: > Education.id_education, null]
-  profile_photo blob [null]
-  role enum('teacher', 'student') [not null]
+  id_education int [ref: > Education.id_education, null]
+  profile_photo varcha(255) [null]
   registration_date date [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
-    (email) [unique, name: "idx_student_email"]
-    (education_id) [name: "idx_student_education"]
+    (email) [name: "idx_student_email"]
+    (id_education) [name: "idx_student_education"]
     (nickname) [name: "idx_nickname"]
   }
 }
 
 Table Education {
   id_education int [pk, increment]
-  name char(100) [not null]
+  name varchar(100) [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 }
 
 Table Category {
   category_id int [pk, increment]
-  category_name varchar(100) [unique, not null]
+  category_name varchar(100) [not null]
   parent_category_id int [ref: > Category.category_id, null]
-  is_superior bool [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
     (category_name) [unique, name: "uq_category_name"]
-    (category_id) [unique, name: "idx_category"]
   }
 }
 
 Table Course {
   course_id int [pk, increment]
   title varchar(200) [not null]
-  description text(2000) [not null]
+  description varchar(2000) [not null]
   difficulty enum('beginner', 'intermediate', 'advanced') [not null]
-  category int [ref: < Category.category_id]
+  category_id int [ref: > Category.category_id, null]
   creation_date date [not null]
   is_active boolean [not null]
-  users_teacher_id int [ref: > User.user_id, not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
-    (users_teacher_id) [name: "idx_course_user"]
-    (category) [name: "idx_course_category"]
+    (category_id) [name: "idx_course_category"]
     (title) [name: "idx_course_title"]
-    (users_teacher_id, course_id) [pk, name: "pk_teacher_in_course"]
   }
 }
 
@@ -57,8 +59,10 @@ Table Lesson {
   lesson_id int [pk, increment]
   course_id int [ref: > Course.course_id]
   title varchar(50) [not null]
-  description text(1000) [null] 
-  requirements text(200) [null]
+  description varchar(1000) [null]
+  requirements varchar(200) [null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
     (course_id) [name: "idx_lesson_course"]
@@ -69,23 +73,25 @@ Table Lesson {
 Table Module {
   id_module int [pk, increment]
   id_lesson int [ref: > Lesson.lesson_id]
-  id_course int [ref: > Course.course_id]
   study_text text
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
-    (id_course) [name: "idx_module_course"]
     (id_lesson) [name: "idx_module_lesson"]
   }
 }
 
 Table Attachment {
-  attachment_id int [pk, increment] 
+  attachment_id int [pk, increment]
   module_id int [ref: > Module.id_module]
-  file longblob [not null]
+  file_path varchar (255)[not null]
   file_name varchar(255) [not null]
   file_size int [not null]
   file_type varchar(20) [not null]
   upload_date datetime [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
     (module_id) [name: "idx_attachment_module"]
@@ -96,6 +102,8 @@ Table UsersInCourse {
   user_id int [ref: > User.user_id]
   course_id int [ref: > Course.course_id]
   role enum('teacher', 'student') [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
     (user_id, course_id) [pk, name: "pk_users_in_course"]
@@ -105,51 +113,65 @@ Table UsersInCourse {
 
 Table Calendar {
   calendar_id int [pk, increment]
-  user_id int [ref: > User.user_id]
+  user_id int [ref: > User.user_id, not null, unique]
+  created_at datetime [not null]
+  updated_at datetime [null]
 }
 
 Table Event {
   id_event int [pk, increment]
   id_calendar int [ref: > Calendar.calendar_id]
   course_id int [ref: > Course.course_id, null]
-  lesson_id int [ref: > Lesson.lesson_id, null]
   is_global bool [not null]
   title varchar(200) [not null]
-  video_call_link text(500) [null]
-  description text(1000) [null]
+  video_call_link varchar(2000) [null]
+  description varchar(1000) [null]
   event_date date [not null]
   event_time time [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
     (course_id) [name: "idx_event_course"]
-    (lesson_id) [name: "idx_event_lesson"]
     (event_date, event_time) [name: "idx_event_datetime"]
   }
 }
 
 Table Message {
   message_id int [pk, increment]
-  sender_id int [ref: > User.user_id, not null]
+  sender_id int [ref: > User. user_id, not null]
   receiver_id int [ref: > User.user_id, not null]
   content text [not null]
   sent_at datetime [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
 
   indexes {
     (sent_at) [name: "idx_message_sent_at"]
+    (sender_id, sent_at) [name: "idx_sender_id"]
+    (receiver_id, sent_at) [name: "idx_receiver_id"]
   }
 }
 
 Table CertificateType {
-  certificate_id int [pk, increment]
+  certificate_type_id int [pk, increment]
   name varchar(255) [not null]
-  description text [not null]               
+  description text [not null]
   badge blob [not null]
-  course_id int [ref: - Course.course_id, not null]
+  course_id int [ref: > Course.course_id, not null, unique]
+  created_at datetime [not null]
+  updated_at datetime [null]
 }
 
 Table UserCertificate {
   user_certificate_id int [pk, increment]
   user_id int [ref: > User.user_id]
-  certificate_type_id int [ref: > CertificateType.certificate_id]
+  certificate_type_id int [ref: > CertificateType.certificate_type_id]
   issue_date date [not null]
+  created_at datetime [not null]
+  updated_at datetime [null]
+
+  indexes {
+    (user_id, certificate_type_id) [unique, name: "uq_user_certificate"]
+  }
 }
