@@ -346,6 +346,5 @@ This is a school project for educational purposes only.
 
 ---
 
-**Made with 💙 for learning database design**
-
+**Whole project was created with heavy use of AI**
 **Made with 💙 for learning database design**
