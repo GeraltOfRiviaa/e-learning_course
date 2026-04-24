@@ -1,6 +1,4 @@
 from django.db import models
-from django.utils import timezone
-import datetime
 # Create your models here.
 
 class Education(models.Model):
@@ -31,7 +29,7 @@ class User(models.Model):
         blank=True,
         db_column="id_education",
     )
-    profile_photo = models.CharField(max_length=255, null=True, blank=True)
+    profile_photo = models.ImageField(upload_to='profile-pics',null=True, blank=True)
     registration_date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
