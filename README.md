@@ -332,10 +332,87 @@ Category ──── Category (Self-referencing hierarchy)
 
 ---
 
+## 🐍 Django Implementation
+
+The project has been extended with a **Django** backend located in the `e-learning-django/` directory. This implementation translates the relational database schema into Django ORM models and exposes all data through Django's built-in admin interface.
+
+### **Project Structure**
+
+```
+e-learning-django/
+├── manage.py              # Django management script
+├── db.sqlite3             # SQLite database (development)
+├── dashboard/             # Django project configuration
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+└── courses/               # Main Django application
+    ├── models.py          # ORM models for all 13 tables
+    ├── admin.py           # Admin interface registrations
+    ├── views.py
+    └── urls.py
+```
+
+### **Setup & Running**
+
+1. **Install dependencies** (Python 3 and Django required):
+   ```bash
+   pip install django pillow
+   ```
+
+2. **Apply migrations** to create the SQLite database:
+   ```bash
+   cd e-learning-django
+   python manage.py migrate
+   ```
+
+3. **Create a superuser** for the admin panel:
+   ```bash
+   python manage.py createsuperuser
+   ```
+
+4. **Start the development server**:
+   ```bash
+   python manage.py runserver
+   ```
+
+5. Open your browser at `http://127.0.0.1:8000/`
+
+---
+
+## 🔑 Django Admin Interface
+
+All 13 database models are registered in Django's admin panel, giving you a ready-to-use web UI to manage all platform data without writing any extra code.
+
+**Access the admin panel** at `http://127.0.0.1:8000/admin/` (requires the superuser created above).
+
+### **Registered models**
+
+| Model | Description |
+|-------|-------------|
+| `Education` | Educational qualification levels |
+| `User` | Platform users with profile photos |
+| `Category` | Hierarchical course categories |
+| `Course` | Courses with difficulty levels |
+| `UsersInCourse` | User–course enrolments and roles |
+| `Lesson` | Lessons belonging to courses |
+| `Module` | Study-text modules within lessons |
+| `Attachment` | Files attached to modules |
+| `Calendar` | Personal calendars for users |
+| `Event` | Calendar events (personal or global) |
+| `Message` | One-to-one messages between users |
+| `CertificateType` | Certificate templates per course |
+| `UserCertificate` | Certificates awarded to users |
+
+---
+
 ## 🛠️ Technologies Used
 
-- **Database**: MySQL
-- **Tools**: phpMyAdmin
+- **Backend**: Python, Django 6
+- **Database**: SQLite (development) / MySQL (original schema)
+- **Admin Interface**: Django Admin
+- **Tools**: phpMyAdmin (original SQL import), dbdiagram.io
 - **Design**: dbdiagram.io
 
 ---
