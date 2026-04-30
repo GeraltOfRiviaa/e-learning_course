@@ -10,8 +10,9 @@ class Education(models.Model):
     class Meta:
         db_table = "education"
         indexes = [
-            models.Index(fields=["name"], name="name_idx"),
-            models.Index(fields=["id_education"], name="id_idx")
+            models.Index(fields=["name"]),
+            models.Index(fields=["id_education"]),
+            models.Index(fields=["created_at"])
         ]
  
     def __str__(self):
@@ -41,11 +42,11 @@ class User(models.Model):
     class Meta:
         db_table = "user"
         indexes = [
-            models.Index(fields=["fist_name", "last_name"], name="first_last_name_idx"),
-            models.Index(fields=["first_name"], name="first_name_idx"),
-            models.Index(fields=["ed_education"], name="id_education_idx"),
-            models.Index(fields=["created_at"], name="created_at_idx"),
-            models.Index(fields=["user_id"], name="user_id_idx")
+            models.Index(fields=["first_name", "last_name"]),
+            models.Index(fields=["first_name"]),
+            models.Index(fields=["ed_education"]),
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["user_id"])
             
         ]
  
@@ -69,9 +70,10 @@ class Category(models.Model):
     class Meta:
         db_table = "category"
         indexes = [
-            models.Index(fields=["category_name"], name="category_name_idx"),
-            models.Index(fields=["parent_category"], name="parent_category_idx"),
-            models.Index(fields=["category_id"], name="category_id_idx"),
+            models.Index(fields=["category_name"]),
+            models.Index(fields=["parent_category"]),
+            models.Index(fields=["category_id"]),
+            models.Index(fields=["created_at"])
         ]
  
     def __str__(self):
@@ -95,13 +97,20 @@ class Course(models.Model):
         null=True,
         blank=True,
     )
-    creation_date = models.DateField()
     is_active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
  
     class Meta:
         db_table = "course"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["is_active"]),
+            models.Index(fields=["course_id"]),
+            models.Index(fields=["title"]),
+            models.Index(fields=["category"]),
+            models.Index(fields=["difficulty"]),
+        ]
  
     def __str__(self):
         return self.title
@@ -122,6 +131,11 @@ class UsersInCourse(models.Model):
     class Meta:
         db_table = "users_in_course"
         unique_together = ("user", "course")
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["role"]),
+            models.Index(fields=["course"]),
+        ]
  
     def __str__(self):
         return f"{self.user} - {self.course} ({self.role})"
@@ -138,6 +152,11 @@ class Lesson(models.Model):
  
     class Meta:
         db_table = "lesson"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["title"]),
+            models.Index(fields=["course"]),
+        ]
  
     def __str__(self):
         return self.title
@@ -156,6 +175,12 @@ class Module(models.Model):
  
     class Meta:
         db_table = "module"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["id_module"]),
+            models.Index(fields=["id_lesson"]),
+            
+        ]
  
     def __str__(self):
         return f"Module {self.id_module} (Lesson: {self.id_lesson})"
@@ -168,12 +193,17 @@ class Attachment(models.Model):
     file_name = models.CharField(max_length=255)
     file_size = models.IntegerField()
     file_type = models.CharField(max_length=20)
-    upload_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
  
     class Meta:
         db_table = "attachment"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["module"]),
+            models.Index(fields=["file_name"]),
+            models.Index(fields=["attachment_id"]),
+        ]
  
     def __str__(self):
         return self.file_name
@@ -181,15 +211,20 @@ class Attachment(models.Model):
  
 class Calendar(models.Model):
     calendar_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    id_user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
  
     class Meta:
         db_table = "calendar"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["calendar_id"]),
+            models.Index(fields=["user_id"]),
+        ]
  
     def __str__(self):
-        return f"Calendar {self.calendar_id} ({self.user})"
+        return f"Calendar {self.calendar_id} ({self.id_user})"
  
  
 class Event(models.Model):
@@ -199,7 +234,7 @@ class Event(models.Model):
         on_delete=models.CASCADE,
         db_column="id_calendar",
     )
-    course = models.ForeignKey(
+    id_course = models.ForeignKey(
         Course,
         on_delete=models.SET_NULL,
         null=True,
@@ -216,6 +251,13 @@ class Event(models.Model):
  
     class Meta:
         db_table = "event"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["id_event"]),
+            models.Index(fields=["id_calendar"]),
+            models.Index(fields=["title"]),
+            models.Index(fields=["event_date"]),
+        ]
  
     def __str__(self):
         return self.title
@@ -240,6 +282,12 @@ class Message(models.Model):
  
     class Meta:
         db_table = "message"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["message_id"]),
+            models.Index(fields=["sender"]),
+            models.Index(fields=["receiver"]),
+        ]
  
     def __str__(self):
         return f"Message {self.message_id}: {self.sender} → {self.receiver}"
@@ -250,12 +298,17 @@ class CertificateType(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     badge = models.BinaryField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    id_course = models.ForeignKey(Course, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
  
     class Meta:
         db_table = "certificate_type"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["name"]),
+            models.Index(fields=["id_course"]),
+        ]
  
     def __str__(self):
         return self.name
@@ -271,6 +324,11 @@ class UserCertificate(models.Model):
  
     class Meta:
         db_table = "user_certificate"
+        indexes = [
+            models.Index(fields=["created_at"]),
+            models.Index(fields=["user_certificate_id"]),
+            models.Index(fields=["issue_date"]),
+        ]
  
     def __str__(self):
         return f"{self.user} - {self.certificate_type}"
