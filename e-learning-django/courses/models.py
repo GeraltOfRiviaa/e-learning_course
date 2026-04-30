@@ -9,6 +9,10 @@ class Education(models.Model):
  
     class Meta:
         db_table = "education"
+        indexes = [
+            models.Index(fields=["name"], name="name_idx"),
+            models.Index(fields=["id_education"], name="id_idx")
+        ]
  
     def __str__(self):
         return self.name
@@ -36,6 +40,14 @@ class User(models.Model):
  
     class Meta:
         db_table = "user"
+        indexes = [
+            models.Index(fields=["fist_name", "last_name"], name="first_last_name_idx"),
+            models.Index(fields=["first_name"], name="first_name_idx"),
+            models.Index(fields=["ed_education"], name="id_education_idx"),
+            models.Index(fields=["created_at"], name="created_at_idx"),
+            models.Index(fields=["user_id"], name="user_id_idx")
+            
+        ]
  
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -56,6 +68,11 @@ class Category(models.Model):
  
     class Meta:
         db_table = "category"
+        indexes = [
+            models.Index(fields=["category_name"], name="category_name_idx"),
+            models.Index(fields=["parent_category"], name="parent_category_idx"),
+            models.Index(fields=["category_id"], name="category_id_idx"),
+        ]
  
     def __str__(self):
         return self.category_name
