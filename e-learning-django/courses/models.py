@@ -29,6 +29,7 @@ def validate_birth_date(value):
 
     try:
         max_birth_date = today.replace(year=today.year - 18)
+    #pouze pokud někdo se narodil 29. února a před 18 lety nebyl rok přestupný 
     except ValueError:
         max_birth_date = today.replace(month=2, day=28, year=today.year - 18)
 
