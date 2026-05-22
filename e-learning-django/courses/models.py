@@ -205,6 +205,11 @@ class Course(models.Model):
         verbose_name="Kategorie",
         help_text="Vyberte kategorii kurzu",
     )
+    img = models.ImageField(upload_to="course_imgs",
+        null=True,
+        blank=True,
+        verbose_name="Miniatura kurzu",
+        help_text="Nahrajte miniaturu kurzu",)
     is_active = models.BooleanField(verbose_name="Aktivní", help_text="Určuje, jestli je kurz viditelný")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Vytvořeno")
     updated_at = models.DateTimeField(null=True, blank=True, verbose_name="Upraveno")
